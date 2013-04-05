@@ -70,3 +70,38 @@ The project can be viewed at:
 > http://studio.verold.com/projects/511399f3fc77b30200000469
 
 If an error occurs, check the response code.  For example, an invalid API key results in a 401 (unauthorized) response.
+
+# Determining Processing Success/Failure
+
+When a model is uploaded to Verold Studio, it is passed off asynchrnously to a cluster of processing servers where the models are optimized, compressed, and added to your project scene. This means, that if you redirect the user directly to Verold Studio immediately after the model files have been uploaded, that the user will likely get there before the modelrs are ready in the scene. Verold Studio will detect that there are jobs processing, and inform the user that a model is on the way. When it's ready, it will be automatically loaded into the scene.
+
+We deliberately do not hold the request open while the uploaded models are processing. However, if you would like to hold the user in your tools until the models have been fully processed, you can easily achieve this by polling on the jobs queue of the project. Then you can only redirect the user to Verold Studio after the model has been fully processed. For this, use the Jobs API:
+
+    GET /projects/{project_id}/jobs.json
+
+an example url is:
+
+    http://studio.verold.com/projects/51504881c1f95e02000002da/jobs.json
+
+The JSON output from that link is:
+
+    [
+      {
+        id: "51504899c1f95e02000002e2",
+        userId: "xxxxxxxxxxxxxxxxxxxxxxx",
+        projectId: "123123123123123123123",
+        filePath: "uploads/asahashashgashahg/hashjahjashsahjashjashjashjahjashjsa/fighter.fbx",
+        state: "COMPLETE",
+        autoInstance: false,
+        dateCreated: "2013-03-25T12:52:41.682Z",
+        dateModified: "2013-03-25T12:49:36.931Z"
+      },
+      ...
+    ]
+
+
+There will be one entry for each uploaded file, and the state of each entry will be one of:
+
+    'CREATED', 'STARTED', 'COMPLETE', 'ERROR'
+
+In normal circumstances the job should go to either complete or error fairly quickly, depending on the complexity of the model.
