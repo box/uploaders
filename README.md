@@ -105,3 +105,17 @@ There will be one entry for each uploaded file, and the state of each entry will
     'CREATED', 'STARTED', 'COMPLETE', 'ERROR'
 
 In normal circumstances the job should go to either complete or error fairly quickly, depending on the complexity of the model.
+
+# Optimization
+
+The Verold Uploader supports decimation and optimization during the upload process. This is especially useful for high-res 3D scans; using the optimization parameters you can very easily generate a version of your model that can be displayed in realtime. Be aware that using these optimization parameters will slow the upload process. 
+
+For an example of how to use the optimization parameters, see the Python upload script:
+
+    Python/VeroldUploader.py
+    
+You can run this as follows:
+
+    python VeroldUploader.py -k api_key -d 0.1 -t 50000 file.obj
+    
+The first step of optimization is to decimate the model. You can speficy either -d for the decimation percentage, or -t for the maximum number of polygons. Models less than 20K polys load extremely fast, then up to 200K polys load pretty well. Beyond 200K polys, model loading gets slower, sometimes unbearably slow on lower powered client machines.
